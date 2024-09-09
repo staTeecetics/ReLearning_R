@@ -1,0 +1,182 @@
+---
+title: "R4DS_MyNotes"
+author: "LucyT"
+format: html
+editor: visual
+---
+
+# R for Data Science - My notes
+
+Re-learning R and GitHub, while trying out Quarto.
+
+## Set-up
+
+**Quarto**
+
+see <https://quarto.org>.
+
+**Running Code**
+
+Click **Render** to generate document. Embed code like this:
+
+```{r}
+1 + 1
+```
+
+Add `echo: false` option to disable printing of code.
+
+**Packages**
+
+Starting with the Tidyverse package, then add others as we progress:
+
+```{r}
+list.of.packages <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
+
+```
+
+Load in Libraries to use the functions of the packages:
+
+```{r}
+#define vector of packages
+new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+lapply(new_package, library, character.only=TRUE)
+```
+
+Updates to the Tidyverse package can be found using:
+
+```{r}
+tidyverse_update(repos = "http://cran.us.r-project.org")
+```
+
+##Chapter 1: Data Visualisation
+
+Using primarily the **ggplot2** package, and the **palmerpenguins** data, with **ggthemes** to use a colorblind friendly colour palette.
+
+To see the full data use **view**:
+
+```{r}
+view(penguins)
+```
+
+To see variables and first few observations use **glimpse**:
+
+```{r}
+glimpse(penguins)
+```
+
+### Use ggplot2 to add layers to a graph
+
+Steps:
+
+1.  Begin with the data
+2.  Map variables to the Aesthetics of the plot
+3.  Add geometric objects to represent the data (e.g. \_bar, \_line, \_boxplot, \_point)
+4.  Modify the Aesthetic mapping
+5.  Additional lines / regressions (e.g. linear model)
+6.  Improve the labels
+7.  Make colourblind friendly
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, 
+                y = body_mass_g)
+) +
+  geom_point(
+    mapping = aes(color = species,
+                  shape = species)
+  ) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)", 
+    y = "Body mass (g)",
+    color = "Species", 
+    shape = "Species"
+  ) +
+  scale_color_colorblind()
+```
+
+### Exercises
+
+1.  How many rows are in penguins? How many columns?
+
+```{r}
+glimpse(penguins)
+```
+*Answer* 344 rows, 7 columns
+
+2.  What does the bill_depth_mm variable in the penguins data frame describe?
+```{r}
+?penguins
+```
+*Answer* A number denoting bill length (millimeters)
+
+3. Make a scatterplot of bill_depth_mm vs. bill_length_mm. Describe the relationship between these two variables.
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_depth_mm, 
+                y = bill_length_mm)
+) +
+  geom_point(
+    mapping = aes(color = species,
+                  shape = species)
+) +
+  labs(
+    title = "Penguin bill length and depth",
+    x = "Bill depth (mm)",
+    y = "Bill length (mm)"
+  )
+```
+*Answer* Positive correlation between bill length and depth.
+
+4.What happens if you make a scatterplot of species vs. bill_depth_mm? What might be a better choice of geom?
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = bill_depth_mm, 
+                y = bill_length_mm)
+) +
+  geom_point(
+    mapping = aes(color = species,
+                  shape = species)
+) +
+  labs(
+    title = "Penguin bill length and depth",
+    x = "Bill depth (mm)",
+    y = "Bill length (mm)"
+  )
+```
+
+
+Why does the following give an error and how would you fix it?
+
+ggplot(data = penguins) + geom_point()
+
+What does the na.rm argument do in geom_point()? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to TRUE.
+
+Add the following caption to the plot you made in the previous exercise: “Data come from the palmerpenguins package.” Hint: Take a look at the documentation for labs().
+
+Recreate the following visualization. What aesthetic should bill_depth_mm be mapped to? And should it be mapped at the global level or at the geom level?
+
+A scatterplot of body mass vs. flipper length of penguins, colored by bill depth. A smooth curve of the relationship between body mass and flipper length is overlaid. The relationship is positive, fairly linear, and moderately strong.
+
+Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
+
+ggplot( data = penguins, mapping = aes(x = flipper_length_mm, y = body_mass_g, color = island) ) + geom_point() + geom_smooth(se = FALSE)
+
+Will these two graphs look different? Why/why not?
+
+ggplot( data = penguins, mapping = aes(x = flipper_length_mm, y = body_mass_g) ) + geom_point() + geom_smooth()
+
+ggplot() + geom_point( data = penguins, mapping = aes(x = flipper_length_mm, y = body_mass_g) ) + geom_smooth( data = penguins, mapping = aes(x = flipper_length_mm, y = body_mass_g)

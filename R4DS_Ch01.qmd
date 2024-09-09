@@ -1,11 +1,11 @@
 ---
-title: "R4DS_MyNotes"
+title: "R4DS_Ch01_MyNotes"
 author: "LucyT"
 format: html
 editor: visual
 ---
 
-# R for Data Science - My notes
+# R for Data Science - Chapter 01 - My notes
 
 Re-learning R and GitHub, while trying out Quarto.
 
@@ -113,15 +113,19 @@ ggplot(
 ```{r}
 glimpse(penguins)
 ```
+
 *Answer* 344 rows, 7 columns
 
 2.  What does the bill_depth_mm variable in the penguins data frame describe?
+
 ```{r}
 ?penguins
 ```
+
 *Answer* A number denoting bill length (millimeters)
 
-3. Make a scatterplot of bill_depth_mm vs. bill_length_mm. Describe the relationship between these two variables.
+3.  Make a scatterplot of bill_depth_mm vs. bill_length_mm. Describe the relationship between these two variables.
+
 ```{r}
 ggplot(
   data = penguins,
@@ -138,9 +142,11 @@ ggplot(
     y = "Bill length (mm)"
   )
 ```
+
 *Answer* Positive correlation between bill length and depth.
 
 4.What happens if you make a scatterplot of species vs. bill_depth_mm? What might be a better choice of geom?
+
 ```{r}
 ggplot(
   data = penguins,
@@ -154,7 +160,9 @@ ggplot(
     y = "species"
   )
 ```
+
 *Answer* Nonsense plot. A better option would be a box and whisker plot
+
 ```{r}
 ggplot(
   data = penguins,
@@ -169,12 +177,12 @@ ggplot(
   )
 ```
 
-5.  Why does the following give an error and how would you fix it?
-**ggplot(data = penguins) + geom_point()**
+5.  Why does the following give an error and how would you fix it? **ggplot(data = penguins) + geom_point()**
 
 *Answer* No Aesthetic mappings for x and y
 
 6.  What does the na.rm argument do in geom_point()? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to TRUE.
+
 ```{r}
 ?geom_point
 
@@ -194,10 +202,12 @@ ggplot(
     y = "Bill length (mm)"
   )
 ```
+
 *Answer* If FALSE, the default, missing values are removed with a warning. If TRUE, missing values are silently removed.
 
 7.  Add the following caption to the plot you made in the previous exercise: “Data come from the palmerpenguins package.”
-``` {r}
+
+```{r}
 ?labs
 
 ggplot(
@@ -219,7 +229,8 @@ ggplot(
 ```
 
 8.  Recreate the following visualization. What aesthetic should bill_depth_mm be mapped to? And should it be mapped at the global level or at the geom level?
-``` {r}
+
+```{r}
 ggplot(
   data = penguins,
   mapping = aes(x = flipper_length_mm, 
@@ -238,12 +249,15 @@ ggplot(
 ###Visualising distributions
 
 **Categorical variables** using bar charts
+
 ```{r}
 penguins |> 
   ggplot(aes(x = species)) + 
   geom_bar()
 ```
+
 An ordered bar chart:
+
 ```{r}
 penguins |> 
   ggplot(aes(x = fct_infreq(species))) + 
@@ -251,6 +265,7 @@ penguins |>
 ```
 
 **Numerical variables** using histograms
+
 ```{r}
 penguins |> 
   ggplot(aes(x = body_mass_g)) + 
@@ -258,6 +273,7 @@ penguins |>
 ```
 
 Using a density plot
+
 ```{r}
 penguins |> 
   ggplot(aes(x = body_mass_g)) + 
@@ -267,43 +283,48 @@ penguins |>
 ###Visualising relationships
 
 **Numerical and Categorical variables** using box plots
-``` {r}
+
+```{r}
 penguins |> 
   ggplot(aes(x = species, y = body_mass_g)) +
   geom_boxplot()
 ```
 
 Using density plots
-``` {r}
+
+```{r}
 penguins |>
   ggplot(aes(x = body_mass_g, color = species)) +
   geom_density(linewidth = 0.75)
 ```
 
 Using filled density plots
-``` {r}
+
+```{r}
 penguins |>
   ggplot(aes(x = body_mass_g, color = species, fill = species)) +
   geom_density(alpha = 0.5)
 ```
 
 **Two Categorical variables** using bar charts
-``` {r}
+
+```{r}
 penguins |> 
   ggplot(aes(x = island, fill = species)) +
   geom_bar()
 ```
 
 Relative frequency plots
-``` {r}
+
+```{r}
 penguins |> 
   ggplot(aes(x = island, fill = species)) +
   geom_bar(position = "fill")
 ```
 
-
 **Two Numerical variables** using scatterplots
-``` {r}
+
+```{r}
 penguins |> 
   ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point()
@@ -312,7 +333,8 @@ penguins |>
 ### Three or more variables
 
 Split the graphs to give more information
-``` {r}
+
+```{r}
 penguins |>
   ggplot(aes(x = flipper_length_mm, y=body_mass_g)) +
   geom_point(aes(colour = species, shape = species)) +
@@ -322,7 +344,8 @@ penguins |>
 ### Saving plots
 
 Use **ggsave** to save the plot to your working directory
-``` {r}
+
+```{r}
 penguins |>
   ggplot(aes(x = flipper_length_mm, y=body_mass_g)) +
   geom_point(aes(colour = species, shape = species)) +
@@ -330,4 +353,4 @@ penguins |>
 ggsave(filename = "penguin-plot.png")
 ```
 
-```
+\`\`\`

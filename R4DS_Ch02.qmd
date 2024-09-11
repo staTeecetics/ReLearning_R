@@ -1,0 +1,74 @@
+---
+title: "R4DS_Ch02_MyNotes"
+author: "LucyT"
+format: html
+editor: visual
+---
+
+# R for Data Science - Chapter 02 - My notes
+
+Re-learning R and GitHub, while trying out Quarto.
+
+## Set-up
+
+**Packages**
+
+Add packages:
+
+```{r  include=FALSE}
+list.of.packages <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
+
+```
+
+Load in Libraries:
+
+```{r  include=FALSE}
+#define vector of packages
+new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+lapply(new_package, library, character.only=TRUE)
+```
+
+##Chapter 2: Workflow: basics
+
+Create new objects using assignment operator <-:
+Combine multiple elements using a vector c():
+Comments use #:
+``` {r}
+#Create a vecotr of primes
+primes <- c(2, 3, 5, 7, 11, 13)
+primes
+```
+
+###Calling functions
+
+Call functions like this: function_name(arguement1 = value1, arguement2 = value2, ...)
+Call the seq function:
+``` {r}
+seq(from = 1, to = 10)
+seq(1, 10)
+```
+
+##Excercises:
+1. Why does this code not work?
+**Answer**: incorrect "i"
+
+2. Tweak each of the following R commands so that they run correctly:
+``` {r}
+library(tidyverse)
+
+ggplot(data = mpg, 
+       mapping = aes(x = displ, y = hwy)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+3. Press Alt + Shift + K. What happens?
+**Answer**: shortcut keys menu

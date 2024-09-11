@@ -1,0 +1,92 @@
+---
+title: "R4DS_Ch03_MyNotes"
+author: "LucyT"
+format: html
+editor: visual
+---
+
+# R for Data Science - Chapter 03 - My notes
+
+Re-learning R and GitHub, while trying out Quarto.
+
+## Set-up
+
+**Packages**
+
+Add packages:
+
+```{r  include=FALSE}
+list.of.packages <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
+
+```
+
+Load in Libraries:
+
+```{r  include=FALSE}
+#define vector of packages
+new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+lapply(new_package, library, character.only=TRUE)
+```
+
+##Chapter 3: Data transformation
+
+Using primarily the **dplyer** package, and the **nycflights13** data. To see different views of the data:
+
+```{r}
+flights
+View(flights)
+glimpse(flights)
+```
+
+Variable names are followed by the type of each variable:
+
+-   <int> is short for integer,
+-   <dbl> is short for double,
+-   <chr> for character (aka strings), and
+-   <dttm> for date-time
+
+Functions have the following order:
+
+1.  The first argument is the data frame.
+2.  Subsequent arguments describe which columns to operate on.
+3.  The output is always a new data frame.
+
+### Rows
+
+The most important verbs that operate on rows are:
+
+-   *filter()*, which changes which rows are present without changing their order, and
+-   *arrange()*, which changes the order of the rows without changing which are present, and
+-   *distinct()*, which finds rows with unique values
+
+Use filter to find all flights that depart more than 2 hours (120 mins) late:
+``` {r}
+flights |>
+  filter(dep_delay > 120)
+```
+
+Use other operators to filter other flights:
+``` {r}
+# Flights that depart on 28 Feb
+jan_01 <- flights |>
+  filter(month == 2 & day == 28)
+glimpse(jan_01)
+
+# Flights that depart in December or January
+dec_jan <- flights |>
+  filter(month == 12 | month == 1)
+
+#Or use %in%
+dec_jan <- flights |>
+  filter(month %in% c(12, 1))
+glimpse(dec_jan)
+```
+

@@ -29,7 +29,7 @@ Add `echo: false` option to disable printing of code.
 
 Starting with the Tidyverse package, then add others as we progress:
 
-```{r}
+```{r include=FALSE}
 list.of.packages <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
     "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
     "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
@@ -41,7 +41,7 @@ if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r
 
 Load in Libraries to use the functions of the packages:
 
-```{r}
+```{r  include=FALSE}
 #define vector of packages
 new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
     "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
@@ -52,7 +52,7 @@ lapply(new_package, library, character.only=TRUE)
 
 Updates to the Tidyverse package can be found using:
 
-```{r}
+```{r  include=FALSE}
 tidyverse_update(repos = "http://cran.us.r-project.org")
 ```
 

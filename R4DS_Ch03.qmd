@@ -67,7 +67,7 @@ The most important verbs that operate on rows are:
 -   *arrange()*, which changes the order of the rows without changing which are present, and
 -   *distinct()*, which finds rows with unique values
 
-Use filter to find all flights that depart more than 2 hours (120 mins) late:
+Use **filter()** to find all flights that depart more than 2 hours (120 mins) late:
 ``` {r}
 flights |>
   filter(dep_delay > 120)
@@ -89,4 +89,106 @@ dec_jan <- flights |>
   filter(month %in% c(12, 1))
 glimpse(dec_jan)
 ```
+
+Use **arrange()** to sort flights: 
+``` {r}
+# Flights sorted by departure time:
+flights |>
+  arrange(year, month, day, dep_time)
+
+# Flights sorted by delay time (descending):
+flights |>
+  arrange(desc(dep_delay))
+```
+
+Use **distinct()** to find unique data:
+``` {r}
+# Remove duplicate rows from data
+flights |>
+  distinct()
+
+# Identify all unique origin and destination pairs
+flights |>
+  distinct(origin, dest)
+
+#Repeat the above but keep the rest of the data for these pairs (will keep the first occurrence):
+flights |>
+  distinct(origin, dest, .keep_all = TRUE)
+```
+
+**Exercises**
+
+1. In a single pipeline for each condition, find all flights that meet the condition:
+``` {r}
+# Had an arrival delay of two or more hours
+flights |>
+  filter(arr_delay >= 120)
+
+# Flew to Houston (IAH or HOU)
+flights |>
+  filter(dest == "IAH" | dest == "HOU")
+
+# Were operated by United, American, or Delta
+flights |>
+  filter(carrier %in% c("UA", "AA", "DL"))
+
+# Departed in summer (July, August, and September)
+flights |>
+  filter(month %in% c(7, 8, 9))
+
+# Arrived more than two hours late but didn’t leave late
+flights |>
+  filter(dep_delay <= 0 & arr_delay > 120)
+
+# Were delayed by at least an hour, but made up over 30 minutes in flight
+flights |>
+  filter(dep_delay >= 60 & arr_delay <= dep_delay - 30)
+```
+
+2. Sort flights to find the flights with the longest departure delays. Find the flights that left earliest in the morning.
+``` {r}
+# Flights with the longest departure delays:
+flights |>
+  arrange(desc(dep_delay))
+
+# Flights that left earliest in the morning:
+flights |>
+  arrange(dep_time)
+```
+
+3. Sort flights to find the fastest flights. 
+``` {r}
+# With help from solutions - use mutate to create speed variable
+flights |>
+  mutate(speed = distance / (air_time / 60)) |>
+  arrange(desc(speed)) |>
+  relocate(speed)
+```
+
+4. Was there a flight on every day of 2013?
+``` {r}
+flights |>
+  distinct(year, month, day) |>
+  nrow()
+```
+5. Which flights traveled the farthest distance? Which traveled the least distance?
+```{r}
+# Farthest distance
+flights |>
+  arrange(desc(distance))
+
+# Least distance
+flights |>
+  arrange(distance)
+```
+
+6. Does it matter what order you used filter() and arrange() if you’re using both? Why/why not? 
+**ANSWER* Yes, after filter the data are smaller so it takes less computational power to arrange.
+
+
+
+
+
+
+
 

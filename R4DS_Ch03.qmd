@@ -36,7 +36,7 @@ new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder
 lapply(new_package, library, character.only=TRUE)
 ```
 
-##Chapter 3: Data transformation
+## Chapter 3: Data transformation
 
 Using primarily the **dplyer** package, and the **nycflights13** data. To see different views of the data:
 
@@ -68,13 +68,15 @@ The most important verbs that operate on rows are:
 -   *distinct()*, which finds rows with unique values
 
 Use **filter()** to find all flights that depart more than 2 hours (120 mins) late:
-``` {r}
+
+```{r}
 flights |>
   filter(dep_delay > 120)
 ```
 
 Use other operators to filter other flights:
-``` {r}
+
+```{r}
 # Flights that depart on 28 Feb
 jan_01 <- flights |>
   filter(month == 2 & day == 28)
@@ -90,8 +92,9 @@ dec_jan <- flights |>
 glimpse(dec_jan)
 ```
 
-Use **arrange()** to sort flights: 
-``` {r}
+Use **arrange()** to sort flights:
+
+```{r}
 # Flights sorted by departure time:
 flights |>
   arrange(year, month, day, dep_time)
@@ -102,7 +105,8 @@ flights |>
 ```
 
 Use **distinct()** to find unique data:
-``` {r}
+
+```{r}
 # Remove duplicate rows from data
 flights |>
   distinct()
@@ -118,8 +122,9 @@ flights |>
 
 **Exercises**
 
-1. In a single pipeline for each condition, find all flights that meet the condition:
-``` {r}
+1.  In a single pipeline for each condition, find all flights that meet the condition:
+
+```{r}
 # Had an arrival delay of two or more hours
 flights |>
   filter(arr_delay >= 120)
@@ -145,8 +150,9 @@ flights |>
   filter(dep_delay >= 60 & arr_delay <= dep_delay - 30)
 ```
 
-2. Sort flights to find the flights with the longest departure delays. Find the flights that left earliest in the morning.
-``` {r}
+2.  Sort flights to find the flights with the longest departure delays. Find the flights that left earliest in the morning.
+
+```{r}
 # Flights with the longest departure delays:
 flights |>
   arrange(desc(dep_delay))
@@ -156,8 +162,9 @@ flights |>
   arrange(dep_time)
 ```
 
-3. Sort flights to find the fastest flights. 
-``` {r}
+3.  Sort flights to find the fastest flights.
+
+```{r}
 # With help from solutions - use mutate to create speed variable
 flights |>
   mutate(speed = distance / (air_time / 60)) |>
@@ -165,13 +172,16 @@ flights |>
   relocate(speed)
 ```
 
-4. Was there a flight on every day of 2013?
-``` {r}
+4.  Was there a flight on every day of 2013?
+
+```{r}
 flights |>
   distinct(year, month, day) |>
   nrow()
 ```
-5. Which flights traveled the farthest distance? Which traveled the least distance?
+
+5.  Which flights traveled the farthest distance? Which traveled the least distance?
+
 ```{r}
 # Farthest distance
 flights |>
@@ -182,13 +192,154 @@ flights |>
   arrange(distance)
 ```
 
-6. Does it matter what order you used filter() and arrange() if you’re using both? Why/why not? 
-**ANSWER* Yes, after filter the data are smaller so it takes less computational power to arrange.
+6.  Does it matter what order you used filter() and arrange() if you’re using both? Why/why not? \*\*ANSWER\* Yes, after filter the data are smaller so it takes less computational power to arrange.
+
+### Columns
+
+The most important verbs that operate on columns are:
+
+-   *mutate()*, which creates a new column derived from existing columns, and
+-   *select()*, which changes which columns are present, and
+-   *rename()*, which changes the name of the column, and
+-   *relocate()*, which changes the positions of the columns
+
+Use **mutate()** to calculate the gain (how much time a delayed flight made up in the air) and the speed (in miles per hour):
+
+```{r}
+#Include .before to add variables to left hand side
+flights |> 
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = distance / air_time * 60
+    .before = 1
+  )
+#Alternatively can use .after and/or variable names to put the new column in a sensible place
+```
+
+Alternatively, control which variables are kept with the .keep argument, "used" specifies only keep the columns that were involved in the mutate() step.
+
+Use **select()** to reduce the number of columns in the dataset: \` It’s not uncommon to get datasets with hundreds or even thousands of variables. In this situation, the first challenge is often just focusing on the variables you’re interested in. select() allows you to rapidly zoom in on a useful subset using operations based on the names of the variables:
+
+```{r}
+# Select columns by name:
+flights |> 
+  select(year, month, day)
+
+# Select all columns between year and day (inclusive):
+flights |> 
+  select(year:day)
+
+# Select all columns except those from year to day (inclusive):
+flights |> 
+  select(!year:day)
+
+# Select all columns that are characters:
+flights |>
+  select(where(is.character))
+
+```
+
+There are a number of helper functions you can use within select():
+
+-   starts_with("abc") / ends_with("abc"): matches names that begin/end with “abc”
+-   contains("ijk"): matches names that contain “ijk”
+-   num_range("x", 1:3): matches x1, x2 and x3
+
+Rename variables as you select() using =. 
+```{r}
+flights |> 
+  select(tail_num = tailnum)
+```
 
 
+Use **rename()** to change the name of variables:
+```{r}
+flights |> 
+  rename(tail_num = tailnum)
+```
+
+Alternatively try *janitor::clean_names()* for useful automated cleaning
 
 
+Use **relocate()** to move variables around:
+```{r}
+flights |> 
+  relocate(time_hour, air_time) 
 
+# Add before/after to be more specific with moving variables
+flights |> 
+  relocate(year:dep_time, .after = time_hour) 
 
+flights |> 
+  relocate(starts_with("arr"), .before = dep_time)
+```
 
+*Exercises*
+
+1.    Compare dep_time, sched_dep_time, and dep_delay. How would you expect those three numbers to be related?:
+```{r}
+# Use mutate to see differences between scheduled and actual departure times, this should be the same as delay
+flights |>
+  mutate(
+    delay_new = sched_dep_time - dep_time,
+    .after = dep_delay
+    )
+# Some differences due to time being in 60 mins
+
+# Use select to see these variables together
+flights |>
+  select(dep_time, sched_dep_time, dep_delay)
+```
+
+2.    Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights.
+```{r}
+# Simple select
+flights |>
+  select(dep_time, sched_dep_time, dep_delay)
+
+# Shortcut using between inclusive
+flights |>
+  select(dep_time:dep_delay)
+
+# Use contains
+flights |>
+  select(contains("dep"))
+```
+
+3.    What happens if you specify the name of the same variable multiple times in a select() call?
+```{r}
+# Try it and see
+flights |>
+  select(dep_time, dep_time)
+```
+**ANSWER:** It only appears once
+
+4.    What does the any_of() function do? Why might it be helpful in conjunction with this vector?
+**Answer** any_of() uses each component of a vector
+```{r}
+# Create a variable containing list of names
+variables <- c("year", "month", "day", "dep_delay", "arr_delay")
+
+# Combine with select
+flights |>
+  select(any_of(variables))
+```
+
+5.    Does the result of running the following code surprise you? How do the select helpers deal with upper and lower case by default? How can you change that default?
+```{r}
+flights |> 
+  select(contains("TIME"))
+
+# To force case-sensitivity use ignore.case
+flights |>
+  select(contains("TIME", ignore.case = FALSE))
+```
+**ANSWER:** This is not case-sensitive
+
+6.    Rename air_time to air_time_min to indicate units of measurement and move it to the beginning of the data frame.
+```{r}
+flights |>
+  rename(air_time_min = air_time) |>
+  relocate(air_time_min)
+```
 

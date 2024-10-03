@@ -1,0 +1,171 @@
+---
+title: "R4DS_Ch04_MyNotes"
+author: "LucyT"
+format: html
+editor: visual
+---
+
+# R for Data Science - Chapter 04 - My notes
+
+Re-learning R and GitHub, while trying out Quarto.
+
+## Set-up
+
+**Packages**
+
+Add packages:
+
+```{r  include=FALSE}
+list.of.packages <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
+
+```
+
+Load in Libraries:
+
+```{r  include=FALSE}
+#define vector of packages
+new_package <- c("tidyverse", "arrow", "babynames", "curl", "duckdb", "gapminder", 
+    "ggrepel", "ggridges", "ggthemes", "hexbin", "janitor", "Lahman", 
+    "leaflet", "maps", "nycflights13", "openxlsx", "palmerpenguins", 
+    "repurrrsive", "tidymodels", "writexl")
+lapply(new_package, library, character.only=TRUE)
+```
+
+## Chapter 4: Workflow: code style
+
+A consistent code style makes it easier to read code.
+
+###Names
+
+Names shold be lowercase, numbers, and "\_" to seperate words.
+
+```{r}
+short_flights <- flights |> 
+  filter(air_time <60)
+```
+
+Add spaces around mathematical operators but not parentheses:
+
+```{r}
+flights |>
+  mutate(speed = distance / (air_time / 60))
+```
+
+Add extra spaces to improve alignment:
+
+```{r}
+#Use integer division (%/%) and remainder (%%) to deal with HHMM division
+flights |> 
+  mutate(
+    speed      = distance / air_time,
+    dep_hour   = dep_time %/% 100,
+    dep_minute = dep_time %%  100
+  )
+```
+
+###Pipes
+
+Pipes should have spaces around them and should typically be the last ting on a line:
+
+```{r}
+flights |> 
+  filter(!is.na(arr_delay), !is.na(tailnum)) |> 
+  count(dest)
+```
+
+If a function has named arguements put each arguement on a seperate line. for each step of the pipeline, indent the line by 2 spaces:
+
+```{r}
+flights |> 
+  group_by(tailnum) |> 
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE),
+    n = n()
+  )
+```
+
+###ggplot2
+
+Treat "+" the same way as a pipe:
+
+```{r}
+flights |> 
+  group_by(month) |> 
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = month, y = delay)) +
+  geom_point() +
+  geom_line()
+```
+
+Equally, if all arguments don't fit in a single line, place on separate lines:
+
+```{r}
+flights |> 
+  group_by(dest) |> 
+  summarise(
+    distance = mean(distance),
+    speed = mean(distance / air_time, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = distance, y = speed)) +
+  geom_smooth(
+    method = "loess", 
+    span = 0.5,
+    se = FALSE, 
+    color = "white",
+    linewidth = 4
+  ) +
+  geom_point()
+```
+
+###Sectioning comments
+
+Use sectioning comments to break up scripts as they get longer:
+
+```{r}
+# Load data ----------------------------------------------------
+
+# Plot data ----------------------------------------------------
+```
+
+*EXERCISES*
+1. Restyle the following pipelines following the guidelines above.
+
+```{r}
+flights |>
+  filter(dest=="IAH") |> 
+  group_by(
+    year, 
+    month,
+    day
+  ) |> 
+  summarize(
+    n = n(),
+    delay = mean(arr_delay, na.rm=TRUE)
+  ) |>
+  filter(n > 10)
+```
+
+```{r}
+flights |> 
+  filter(
+    carrier == "UA",
+    dest %in% c("IAH", "HOU"),
+    sched_dep_time > 0900,
+    sched_arr_time < 2000
+  ) |> 
+  group_by(flight) |> 
+  summarize(
+    delay = mean(arr_delay, na.rm=TRUE),
+    cancelled = sum(is.na(arr_delay)), 
+    n = n()
+  ) |> 
+  filter(n > 10) 
+```
+
